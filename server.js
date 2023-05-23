@@ -1,5 +1,7 @@
+// EXPRESS crée notre serveur web
 const express = require('express');
 const app = express();
+
 app.get('/', (req, res) => {
     res.send('Hello, world!');
   });
@@ -8,7 +10,7 @@ app.get('/', (req, res) => {
     console.log(`Serveur en écoute sur le port ${port}`);
   });
     
-
+// PUPPETEER permet de crawler les pages web qu'on lui fournit
 const puppeteer = require('puppeteer');
 app.get('/crawl', async (req, res) => {
   try {
