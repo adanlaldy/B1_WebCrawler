@@ -14,7 +14,7 @@ app.get('/', async (req, res) => {
     const element = await page.waitForSelector('div > #product-list-cont');
     const elementContent = await page.evaluate(el => el.innerHTML, element);
     
-    req.send(elementContent);
+    res.send(elementContent);
 
     await browser.close();
 
