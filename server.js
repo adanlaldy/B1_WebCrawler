@@ -1,48 +1,35 @@
-const express = require('express');
 const puppeteer = require('puppeteer');
-
+const express = require('express');
 const app = express();
 
-app.get('/crawl', async (req, res) => {
-  try {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    
-    // Naviguer vers le site Audemars Piguet
-    await page.goto('https://www.audemarspiguet.com/com/fr/collections/code-11-59.html');
-    
-    // Récupérer les informations souhaitées
-    const watches = await page.evaluate(() => {
-      // Sélectionnez les éléments contenant les informations des montres
-      const watchElements = Array.from(document.querySelectorAll('.ap-watch-card__wrapper'));
-      
-      // Extrayez les informations nécessaires pour chaque montre
-      const watchData = watchElements.map((element) => {
-        const image = element.querySelector('ap-watch-card__image ap-image').src;
-        const name = element.querySelector('.ap-watch-card__title').innerText;
-        // const price = element.querySelector('.watch-price').innerText;
-        const description = element.querySelector('.ap-watch-card__material').innerText;
-        
-        return {
-          image,
-          name,
-          // price,
-          description
-        };
-      });
-      
-      return watchData;
-    });
-    
-    await browser.close();
-    
-    res.json(watches);
-  } catch (error) {
-    console.error('Une erreur s\'est produite :', error);
-    res.status(500).send('Une erreur s\'est produite lors du crawling du site.');
+app.get('/', async (req, res) => {
+  // Lancer le navigateur
+  const browser = await puppeteer.launch();
+
+  // Créer une page
+  const page = await browser.newPage();
+
+  // Accéder à votre site
+  await page.goto('https://www.omegawatches.com/fr-fr/watches/constellation/globemaster/catalog');
+
+  // Rechercher les éléments spécifiques
+  const elements = await page.$$('ol#product-list-grid .product-item');
+  let elementContent = "";
+  for (const item of elements) {
+    elementContent += await page.evaluate(el => el.innerHTML, item);
   }
+
+  // Fermer le navigateur
+  await browser.close();
+
+  // Envoyer le contenu des éléments dans la réponse
+  res.send(elementContent);
 });
 
-app.listen(3000, () => {
-  console.log('Serveur en écoute sur le port 3000');
+//plus qu'à récup les images
+
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Serveur en écoute sur le port ${port}`);
+  console.log("http://localhost:3000/");
 });
