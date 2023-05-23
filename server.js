@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const express = require('express');
+const path = require('path');
 const app = express();
 
 const port = 3000;
@@ -8,7 +9,9 @@ app.listen(port, () => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile('/home/voluxyy/Fichier/Gitea/WebCrawler/assets/html/main.html');
+  // Chemin linux : '/home/voluxyy/Fichier/Gitea/WebCrawler/assets/html/main.html'
+  // Chemin windows : 'E:\Fichier\Travail\Gitea\WebCrawler\assets\html\main.html'
+    res.sendFile(path.join(__dirname, 'assets', 'html', 'main.html'));
   });
 
 app.get('/crawl', async (req, res) => {
@@ -38,8 +41,8 @@ app.get('/crawl', async (req, res) => {
       const nameElem = await element.$('.product-tile__model');
       const priceElem = await element.$('.product-tile__price');
 
-      const name = page.evaluate(el => el.textContent, nameElem);
-      const price = page.evaluate(el => el.textContent, priceElem);
+      const name = page.evaluate(el => el, nameElem);
+      const price = page.evaluate(el => el, priceElem);
 
       watches.push({
         "name": name,
