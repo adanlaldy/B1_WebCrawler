@@ -27,42 +27,25 @@ app.get('/crawl', async (req, res) => {
     // Accéder à votre site
     await page.goto('https://www.chronext.fr/rolex');
 
-    const selector = '.product-tile';
-
-    // Attendre que la liste soit chargée
-    await page.waitForSelector(selector);
-
     // Recupère la liste
-    const elements = await page.$$(selector);
-    const watches = [];
+    const elements = await page.$$('div.product-list .product-tile .product-tile__info');
+
+    let watchesInfo = [];
 
     // Recupère les éléments
     for (const element of elements) {
-      const nameElem = await element.$('.product-tile__model');
-      const priceElem = await element.$('.product-tile__price');
-
-      const name = page.evaluate(el => el, nameElem);
-      const price = page.evaluate(el => el, priceElem);
-
-      watches.push({
-        "name": name,
-        "price": price,
-      });
+      watchesInfo.push(await page.evaluate(el => el.innerHTML, element));
     }
 
-    // Fermer le navigateur
-    await browser.close();
-
     // Envoyer le contenu de l'élément dans la réponse
-    res.send(
-        `<div>
-          <h1>${watches[0].name}</h1>
-          <h2>${watches[0].price}</h2>
-        </div>`
-    );
+    res.send(watchesInfo[0]);
 
   } catch (error) {
     console.error(error);
-    res.status(500).send('Erreur lors du crawling');
+    res.status(500).send(`
+    <div>
+      <h1>Erreur lors du crawling</h1>
+    </div>
+    `);
   }
 });
