@@ -28,17 +28,52 @@ app.get('/crawl', async (req, res) => {
     await page.goto('https://www.chronext.fr/rolex');
 
     // Recupère la liste
-    const elements = await page.$$('div.product-list .product-tile .product-tile__info');
+    const models = await page.$$('div.product-list .product-tile .product-tile__info .product-tile__model');
+    const prices = await page.$$('div.product-list .product-tile .product-tile__info .product-tile__price');
+    const imgs = await page.$$('div.product-list .product-tile figure.product-tile__figure');
+
+    console.log("models: ", models);
+    console.log("prices: ", prices);
+    console.log("imgs: ", imgs); 
 
     let watchesInfo = [];
 
+    // Initialize length of watchesInfo
+    for (const _ of models) {
+      watchesInfo.push({
+        "model": "",
+        "price": "",
+        "img": "",
+      })
+    }
+
     // Recupère les éléments
-    for (const element of elements) {
-      watchesInfo.push(await page.evaluate(el => el.innerHTML, element));
+    for (let i = 0; i < models.length; i++) {
+      watchesInfo[i].model = await page.evaluate(el => el.innerHTML, models[i]);
+      watchesInfo[i].price = await page.evaluate(el => el.innerHTML, prices[i]);
+    }
+
+    // for (let i = 0; i < imgs.length; i++) {
+    //   watchesInfo[i].img = await page.evaluate(el => el.innerHTML, imgs[i]);
+    // }
+
+    let result = "";
+    for (const watcheInfo of watchesInfo) {
+      result += `
+      <div class="watch-model">
+        ${watcheInfo.model}
+      </div>
+      <div class="watch-price">
+        ${watcheInfo.price}
+      </div>
+      <div class="watch-image">
+        ${watcheInfo.img}
+      </div>
+      `
     }
 
     // Envoyer le contenu de l'élément dans la réponse
-    res.send(watchesInfo[0]);
+    res.send(result);
 
   } catch (error) {
     console.error(error);
