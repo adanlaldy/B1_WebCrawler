@@ -67,10 +67,6 @@ app.get('/crawl', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send(`
-    <div>
-      <h1>Erreur lors du crawling</h1>
-    </div>
-    `);
+    res.status(500).send('Erreur lors du crawling');
   }
 });
