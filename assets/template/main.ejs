@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>Scrapper PRO</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css">
+</head>
+<body>
+<div class="head">
+    <h1>Scrapper PRO</h1>
+    <hr>
+</div>
+<div id="data">
+    <ul>
+        <% for(const watch of data) { %>
+            <li>
+                <%= watch.model %>
+                <%= watch.price %>
+                <img src="<%= watch.img %>" alt="Watch image">
+            </li>
+        <% } %>
+    </ul>
+</div>
+<div class="end">
+    <hr>
+    <h1>Scrapper PRO</h1>
+</div>
+</body>
+</html>
