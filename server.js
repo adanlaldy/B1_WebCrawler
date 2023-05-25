@@ -5,6 +5,9 @@ const app = express();
 
 app.use(express.static('assets/css'));
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'assets', 'template'));
+
 const port = 3000;
 app.listen(port, () => {
   console.log(`Serveur en écoute sur le port ${port}`);
@@ -27,20 +30,25 @@ app.get('/crawl', async (req, res) => {
     // Accéder à votre site
     await page.goto('https://www.chronext.fr/rolex');
 
+    await page.waitForSelector()
+
+    // .product-tile__info
+    // .product-tile__info
+    // .product-tile
     // Recupère la liste
-    const models = await page.$$('div.product-tile__info .product-tile__model');
-    const prices = await page.$$('div.product-tile__info .product-tile__price .price');
-    const imgs = await page.$$('div.product-tile .product-tile__figure');
+    const models = await page.$$('div.product-tile__model');
+    const prices = await page.$$('div.product-tile__price .price');
+    const imgs = await page.$$('figure.product-tile__figure img');
 
-    console.log("models: ", models);
-    console.log("prices: ", prices);
-    console.log("imgs: ", imgs);
+    console.log(models);
+    console.log(prices);
+    console.log(imgs);
 
-    let watchesInfo = [];
+    let watches = [];
 
-    // Initialize length of watchesInfo
+    // Initialize length of watches
     for (const _ of models) {
-      watchesInfo.push({
+      watches.push({
         "model": "",
         "price": "",
         "img": "",
@@ -49,51 +57,13 @@ app.get('/crawl', async (req, res) => {
 
     // Recupère les éléments
     for (let i = 0; i < models.length; i++) {
-      watchesInfo[i].model = await page.evaluate(el => el.innerHTML, models[i]);
-      watchesInfo[i].price = await page.evaluate(el => el.innerHTML, prices[i]);
-      watchesInfo[i].img = await page.evaluate(el => el.innerHTML, imgs[i]);
+      watches[i].model = await page.evaluate(el => el.textContent, models[i]);
+      watches[i].price = await page.evaluate(el => el.textContent, prices[i]);
+      watches[i].img = await page.evaluate(el => el.getAttribute('src'), imgs[i]);
     }
-
-    let result = `
-    <html>
-    <head>
-        <title>Scrapper PRO</title>
-        <link rel="stylesheet" type="text/css" href="assets/css/main.css">
-    </head>
-    <body>
-        <div class="head">
-            <h1>Scrapper PRO</h1>
-            <hr>
-        </div>
-    `;
-
-    for (const watcheInfo of watchesInfo) {
-      result += `
-      <div class="watch-info">
-        <div class="watch-model">
-            ${watcheInfo.model}
-        </div>
-        <div class="watch-price">
-            ${watcheInfo.price}
-        </div>
-      </div>
-      <div class="watch-image">
-        ${watcheInfo.img}
-      </div>
-      `;
-    }
-
-    result += `
-        <div class="end">
-            <hr>
-            <h1>Scrapper PRO</h1>
-        </div>
-    </body>
-    </html>
-    `;
 
     // Envoyer le contenu de l'élément dans la réponse
-    res.send(result);
+    res.render('main', { data: watches });
 
   } catch (error) {
     console.error(error);
