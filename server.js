@@ -1,9 +1,15 @@
 const puppeteer = require('puppeteer');
 const express = require('express');
+
 const path = require('path');
 const app = express();
 
-app.use(express.static('assets/css'));
+app.use(express.static(path.join(__dirname, 'assets')));
+
+app.get('/assets/css/main.css', (req, res) => {
+  res.setHeader('Content-Type', 'text/css');
+  res.sendFile(path.join(__dirname,'/assets/css/main.css'));
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'assets', 'template'));
@@ -29,8 +35,6 @@ app.get('/crawl', async (req, res) => {
 
     // Accéder à votre site
     await page.goto('https://www.chronext.fr/rolex');
-
-    await page.waitForSelector()
 
     // .product-tile__info
     // .product-tile__info
@@ -66,7 +70,6 @@ app.get('/crawl', async (req, res) => {
     res.render('main', { data: watches });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Erreur lors du crawling');
+    res.status(404).sendFile(path.join(__dirname, 'assets', 'html', '404.html'));
   }
 });
