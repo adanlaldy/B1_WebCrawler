@@ -28,7 +28,7 @@ app.get('/both', async (req, res) => {
 
     watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
 
-    res.render('main', { data: watches });
+    res.render('both', { data: watches });
 })
 
 app.get('/omega', async (req, res) => {
