@@ -21,40 +21,55 @@ app.get('/crawl', async (req, res) => {
   try {
     // Lancer le navigateur
     const browser = await puppeteer.launch({
-      headless: "new",
+      headless: false,
     });
 
     // Créer une page
     const page = await browser.newPage();
 
-    // Accéder à votre site
-    await page.goto('https://www.watchfinder.fr/Rolex/watches/all');
-
-    await page.waitForNavigation();
-
-    /*
-    div globale : 'div[data-testid="searchResultContainer"]'
-    div des montres : 'div[data-testid="watchItem"]'
-    info : 'a[data-testid="watchLink"]'
-    model : 'a[data-testid="watchLink"] div[data-testid="watchSeries"]'
-    prix : 'a[data-testid="watchLink"] div[data-testid="watchPrice"]'
-    image : 'a[data-testid="watchLink"] img'
-     */
-
-    // Recupère la liste
-    const watchesList = await page.$$('a[data-testid="watchLink"]');
-
-    console.log("watchesList: ", watchesList.length);
-
     let watches = [];
-    // Recupère les éléments
-    for (let i = 0; i < watchesList.length; i++) {
-      watches.push({
-        "model": await page.evaluate(el => el.innerHTML, watchesList[i]),
-        "price": await page.evaluate(el => el.innerHTML, watchesList[i]),
-        "img": await page.evaluate(el => el.innerHTML, watchesList[i]),
-      });
+
+    for (let index = 0; index <= 13; index++) {
+      // Accéder à votre site
+      await Promise.all([
+        page.goto(`https://www.watchfinder.fr/Rolex/watches/all?pageno=${index}`),
+        page.waitForNavigation({ waitUntil: 'networkidle0' }),
+      ]);
+  
+      await page.waitForSelector('picture img');
+  
+      /*
+      div globale : 'div[data-testid="searchResultContainer"]'
+      div des montres : 'div[data-testid="watchItem"]'
+      info : 'a[data-testid="watchLink"]'
+      model : 'a[data-testid="watchLink"] div[data-testid="watchSeries"]'
+      prix : 'a[data-testid="watchLink"] div[data-testid="watchPrice"]'
+      image : 'a[data-testid="watchLink"] img'
+       */
+  
+      // Recupère la liste
+      const watchesList = await page.$$('div.row div[data-testid="searchResultContainer"] div[data-testid="watchItem"]');
+  
+      
+      // Recupère les éléments
+      for (let i = 0; i < watchesList.length; i++) {
+        var img = "";
+        getImgLink(watchesList[i])
+        .then(resp => img = resp);
+  
+        watches.push({
+          "model": await watchesList[i].$eval('div[data-testid="watchSeries"]', el => el.textContent),
+          "price": await watchesList[i].$eval('div[data-testid="watchPrice"]', el => el.textContent),
+          "img": img,
+        });
+
+        console.log('WatchesList ', i, ": ", watches[i]);
+      }
     }
+
+    browser.close();
+
+    console.log('Total WatchesList length: ', watches.length);
 
     // Envoyer le contenu de l'élément dans la réponse
     res.render('main', { data: watches });
@@ -68,3 +83,24 @@ app.get('/crawl', async (req, res) => {
     `);
   }
 });
+
+async function getImgLink(currentWatch) {
+  const img = await currentWatch.$eval('picture img', el => el.getAttribute('srcset'));
+  const goodLink = getFirstLink(img);
+
+  if (goodLink == null) {
+    return currentWatch.$eval('picture img', el => el.getAttribute('src'));
+  }
+
+  return goodLink;
+};
+
+function getFirstLink(dataSrcset) {
+  if (dataSrcset != null) {
+    const links = dataSrcset.split(", ");
+    const firstLink = links[0].split(" ")[0];
+    return firstLink;
+  } else {
+    return null;
+  }
+}

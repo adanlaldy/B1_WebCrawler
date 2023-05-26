@@ -11,9 +11,18 @@
 
         <div id="data">
                 <% for(const watch of data) { %>
-                        <%= watch.model %>
-                        <%= watch.price %>
-                        <img src="<%= watch.img %>" alt="Watch image">
+                    <div class="watch">
+                        <div class="watch-model">
+                            <%= watch.model %>
+                        </div>
+                        <div class="watch-price">
+                            <%= watch.price %>
+                        </div>
+                        <div class="watch-image">
+                            <img src="<%= watch.img %>" alt="Watch image">
+                        </div>
+                    </div>
+                    
                 <% } %>
         </div>
 
