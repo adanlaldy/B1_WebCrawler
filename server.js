@@ -3,6 +3,14 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+let watchFinder_watches = [];
+let omega_watches = [];
+
+const init = async () => {
+    watchFinder_watches = await scrapWatchFinder();
+    omega_watches = await scrapOmega();
+};
+
 app.use(express.static('assets/css'));
 
 app.get('/assets/css/main.css', (req, res) => {
@@ -14,42 +22,39 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'assets', 'template'));
 
 const port = 3000;
-app.listen(port, () => {
-  console.log(`Serveur en écoute sur le port ${port}`);
-});
+(async () => {
+    try {
+        await init();
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'assets', 'html', 'index.html'));
-  });
+        app.listen(port, () => {
+            console.log(`Serveur en écoute sur le port ${port}`);
+        });
 
-app.get('/both', async (req, res) => {
-    let watches = await scrapOmega();
-    watches.concat(await scrapWatchFinder());
+        app.get('/', (req, res) => {
+            res.sendFile(path.join(__dirname, 'assets', 'html', 'index.html'));
+        });
 
-    watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        app.get('/both', async (req, res) => {
+            const watches = [...watchFinder_watches, ...omega_watches];
+            watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+            res.render('both', { data: watches });
+        })
 
-    res.render('both', { data: watches });
-})
+        app.get('/omega', async (req, res) => {
+            res.render('omega', { data: omega_watches });
+        })
 
-app.get('/omega', async (req, res) => {
-    let watches = await scrapOmega();
-    if (watches != null) {
-        watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        app.get('/watchfinder', async (req, res) => {
+            res.render('watchfinder', { data: watchFinder_watches });
+        })
+
+        app.get('**', (req, res) => {
+            res.sendFile(path.join(__dirname, 'assets', 'html', '404.html'));
+        });
+
+    } catch (_) {
     }
-    res.render('omega', { data: watches });
-})
-
-app.get('/watchfinder', async (req, res) => {
-    let watches = await scrapWatchFinder();
-    if (watches != null) {
-        watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-    }
-    res.render('watchfinder', { data: watches });
-})
-
-app.get('**', (req, res) => {
-    res.sendFile(path.join(__dirname, 'assets', 'html', '404.html'));
-});
+})();
 
 async function scrapOmega() {
     try {
@@ -97,6 +102,11 @@ async function scrapOmega() {
                 });
             }
         }
+
+        await browser.close();
+
+        watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+
         return watches;
     } catch (error) {
         console.error(error);
@@ -127,15 +137,6 @@ async function scrapWatchFinder() {
 
             await autoScroll(page);
 
-            /*
-            div globale : 'div[data-testid="searchResultContainer"]'
-            div des montres : 'div[data-testid="watchItem"]'
-            info : 'a[data-testid="watchLink"]'
-            model : 'a[data-testid="watchLink"] div[data-testid="watchSeries"]'
-            prix : 'a[data-testid="watchLink"] div[data-testid="watchPrice"]'
-            image : 'a[data-testid="watchLink"] img'
-             */
-
             // Recupère la liste
             const watchesList = await page.$$('div.row div[data-testid="searchResultContainer"] div[data-testid="watchItem"]');
 
@@ -159,6 +160,8 @@ async function scrapWatchFinder() {
 
         await browser.close();
 
+        watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+
         return watches;
 
     } catch (error) {
@@ -178,7 +181,7 @@ function getFirstLink(dataSrcset) {
     await page.evaluate(async () => {
         await new Promise((resolve, reject) => {
             let totalHeight = 0;
-            const distance = 200;
+            const distance = 150;
             const scrollInterval = setInterval(() => {
                 const scrollHeight = document.documentElement.scrollHeight;
                 window.scrollBy(0, distance);
