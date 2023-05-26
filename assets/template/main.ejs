@@ -10,15 +10,11 @@
         </div>
 
         <div id="data">
-            <ul>
                 <% for(const watch of data) { %>
-                    <li>
                         <%= watch.model %>
                         <%= watch.price %>
                         <img src="<%= watch.img %>" alt="Watch image">
-                    </li>
                 <% } %>
-              </ul>
         </div>
 
         <div class="end">

@@ -28,38 +28,32 @@ app.get('/crawl', async (req, res) => {
     const page = await browser.newPage();
 
     // Accéder à votre site
-    await page.goto('https://www.chronext.fr/rolex');
+    await page.goto('https://www.watchfinder.fr/Rolex/watches/all');
 
-    await page.waitForSelector()
+    await page.waitForNavigation();
 
-    // .product-tile__info
-    // .product-tile__info
-    // .product-tile
+    /*
+    div globale : 'div[data-testid="searchResultContainer"]'
+    div des montres : 'div[data-testid="watchItem"]'
+    info : 'a[data-testid="watchLink"]'
+    model : 'a[data-testid="watchLink"] div[data-testid="watchSeries"]'
+    prix : 'a[data-testid="watchLink"] div[data-testid="watchPrice"]'
+    image : 'a[data-testid="watchLink"] img'
+     */
+
     // Recupère la liste
-    const models = await page.$$('div.product-tile__model');
-    const prices = await page.$$('div.product-tile__price .price');
-    const imgs = await page.$$('figure.product-tile__figure img');
+    const watchesList = await page.$$('a[data-testid="watchLink"]');
 
-    console.log(models);
-    console.log(prices);
-    console.log(imgs);
+    console.log("watchesList: ", watchesList.length);
 
     let watches = [];
-
-    // Initialize length of watches
-    for (const _ of models) {
-      watches.push({
-        "model": "",
-        "price": "",
-        "img": "",
-      })
-    }
-
     // Recupère les éléments
-    for (let i = 0; i < models.length; i++) {
-      watches[i].model = await page.evaluate(el => el.textContent, models[i]);
-      watches[i].price = await page.evaluate(el => el.textContent, prices[i]);
-      watches[i].img = await page.evaluate(el => el.getAttribute('src'), imgs[i]);
+    for (let i = 0; i < watchesList.length; i++) {
+      watches.push({
+        "model": await page.evaluate(el => el.innerHTML, watchesList[i]),
+        "price": await page.evaluate(el => el.innerHTML, watchesList[i]),
+        "img": await page.evaluate(el => el.innerHTML, watchesList[i]),
+      });
     }
 
     // Envoyer le contenu de l'élément dans la réponse
