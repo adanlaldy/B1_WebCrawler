@@ -1,34 +1,34 @@
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="../../assets/css/main.css">
         <title>Scrapper PRO</title>
-        <link rel="stylesheet" type="text/css" href="assets/css/main.css">
     </head>
     <body>
         <div class="head">
-            <h1>Scrapper PRO</h1>
-            <hr>
+            <h1>We are scrapping <a href="https://www.chronext.fr/rolex" target="_blank">chronext</a>.</h1>
         </div>
 
         <div id="data">
+            <div class="watches__grid">
                 <% for(const watch of data) { %>
-                    <div class="watch">
-                        <div class="watch-model">
-                            <%= watch.model %>
-                        </div>
-                        <div class="watch-price">
-                            <%= watch.price %>
-                        </div>
-                        <div class="watch-image">
-                            <img src="<%= watch.img %>" alt="Watch image">
-                        </div>
+
+                <div class="watches__list watches__border">
+                    <div class="watches__model">
+                        <%= watch.model %>
                     </div>
+                    <div  class="watches__image">
+                        <img src="<%= watch.img %>" alt="Watch image">
+                    </div>
+                    <div class="watches__price">
+                        <%= watch.price %>
+                    </div>
+                </div>
 
                 <% } %>
-        </div>
-
-        <div class="end">
-            <hr>
-            <h1>Scrapper PRO</h1>
+              </div>
         </div>
     </body>
 </html>
