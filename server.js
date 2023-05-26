@@ -28,6 +28,28 @@ app.get('/crawl', async (req, res) => {
     const page = await browser.newPage();
 
     let watches = [];
+        // Liste des URLs des pages à parcourir
+        const urls = [
+            'https://www.omegawatches.com/fr-fr/watches/constellation/globemaster/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/constellation/constellation/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/seamaster/aqua-terra-150m/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/seamaster/diver-300-m/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/seamaster/planet-ocean/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/seamaster/heritage-models/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/speedmaster/moonwatch-professional/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/speedmaster/heritage-models/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/speedmaster/dark-side-of-the-moon/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/speedmaster/speedmaster-38-mm/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/speedmaster/two-counters/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/speedmaster/instruments/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/de-ville/ladymatic/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/de-ville/tresor/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/de-ville/prestige/catalog',
+            'https://www.omegawatches.com/fr-fr/watches/de-ville/tourbillon/catalog',
+        ];
+
+        // Tableau pour stocker le contenu des éléments
+        let watches = [];
 
     for (let index = 0; index <= 13; index++) {
       // Accéder à votre site
@@ -82,6 +104,36 @@ app.get('/crawl', async (req, res) => {
     </div>
     `);
   }
+        for (const url of urls) {
+            // Accéder à la page spécifique
+            await page.goto(url);
+
+            const elements = await page.$$('ol#product-list-grid .product-item');
+            for (let i = 0; i < elements.length; i++) {
+                const model = await elements[i].$eval('.ow-prod__desc-top .name', el => el.textContent);
+                const collection = await elements[i].$eval('.ow-prod__desc-top .collection', el => el.textContent);
+                const price = await elements[i].$eval('p.price-box .price', el => el.textContent);
+                const img = await elements[i].$eval('a.ow-prod__img source', el => el.getAttribute('data-srcset'));
+
+                watches.push({
+                    "model": collection + model,
+                    "price": price,
+                    "img": getFirstLink(img),
+                });
+            }
+        }
+        // Tri du tableau par prix croissant
+        watches.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+
+        res.render('main', {data: watches});
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(`
+    <div>
+      <h1>Erreur lors du crawling</h1>
+    </div>
+    `);
+    }
 });
 
 async function getImgLink(currentWatch) {
