@@ -20,10 +20,12 @@ app.listen(port, () => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'assets', 'html', 'main.html'));
+    res.sendFile(path.join(__dirname, 'assets', 'html', 'index.html'));
   });
 
-app.get('/crawl', async (req, res) => {
+
+
+app.get('/chronext', async (req, res) => {
   try {
     // Lancer le navigateur
     const browser = await puppeteer.launch({
@@ -36,9 +38,6 @@ app.get('/crawl', async (req, res) => {
     // Accéder à votre site
     await page.goto('https://www.chronext.fr/rolex');
 
-    // .product-tile__info
-    // .product-tile__info
-    // .product-tile
     // Recupère la liste
     const models = await page.$$('div.product-tile__model');
     const prices = await page.$$('div.product-tile__price .price');
@@ -67,9 +66,15 @@ app.get('/crawl', async (req, res) => {
     }
 
     // Envoyer le contenu de l'élément dans la réponse
-    res.render('main', { data: watches });
+    res.render('chronext', { data: watches });
 
   } catch (error) {
     res.status(404).sendFile(path.join(__dirname, 'assets', 'html', '404.html'));
   }
 });
+
+
+app.get('**', (req, res) => {
+  res.sendFile(path.join(__dirname, 'assets', 'html', '404.html'));
+});
+
