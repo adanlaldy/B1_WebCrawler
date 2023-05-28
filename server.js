@@ -7,8 +7,13 @@ let watchFinder_watches = [];
 let omega_watches = [];
 
 const init = async () => {
-    watchFinder_watches = await scrapWatchFinder();
-    omega_watches = await scrapOmega();
+    const watchFinderPromise = scrapWatchFinder();
+    const omegaPromise = scrapOmega();
+
+    const [watchFinderData, omegaData] = await Promise.all([watchFinderPromise, omegaPromise]);
+
+    watchFinder_watches = watchFinderData;
+    omega_watches = omegaData;
 };
 
 app.use(express.static('assets/css'));
@@ -179,7 +184,7 @@ function getFirstLink(dataSrcset) {
 }
  async function autoScroll(page) {
     await page.evaluate(async () => {
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve, _) => {
             let totalHeight = 0;
             const distance = 150;
             const scrollInterval = setInterval(() => {
