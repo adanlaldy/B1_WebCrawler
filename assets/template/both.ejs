@@ -13,21 +13,6 @@
 </div>
 
 <div id="data">
-    <!-- Ajoutez les options de tri par prix -->
-    <form action="/both" method="get">
-        <label for="sortBy">Trier par prix:</label>
-        <select name="sortBy" id="sortBy">
-            <option value="">Aucun</option>
-            <option value="price">Prix</option>
-        </select>
-        <label for="sortOrder">Ordre:</label>
-        <select name="sortOrder" id="sortOrder">
-            <option value="asc">Croissant</option>
-            <option value="desc">Décroissant</option>
-        </select>
-        <button type="submit">Appliquer</button>
-    </form>
-
     <div class="watches__grid">
         <% for(const watch of data) { %>
 
