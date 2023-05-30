@@ -4,7 +4,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="../../assets/css/main.css">
-        <title>Scrapper PRO</title>
+        <title>WatchFinder</title>
     </head>
     <body>
         <div class="head">
@@ -15,19 +15,19 @@
         <div id="data">
             <div class="watches__grid">
                 <% for(const watch of data) { %>
-
-                <div class="watches__list watches__border">
-                    <div class="watches__model">
-                        <%= watch.model %>
+                    <div class="watches__card">
+                        <div class="watches__list watches__border">
+                            <div class="watches__model">
+                                <%= watch.model %>
+                             </div>
+                            <div  class="watches__image">
+                                 <img src="<%= watch.img %>" alt="Watch image">
+                            </div>
+                            <div class="watches__price">
+                                 <%= watch.price %>
+                            </div>
+                        </div>
                     </div>
-                    <div  class="watches__image">
-                        <img src="<%= watch.img %>" alt="Watch image">
-                    </div>
-                    <div class="watches__price">
-                        <%= watch.price %>
-                    </div>
-                </div>
-
                 <% } %>
               </div>
         </div>
