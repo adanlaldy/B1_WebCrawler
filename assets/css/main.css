@@ -5,6 +5,12 @@
     src: url("Gavency Free Regular.otf") format("opentype");
 }
 
+:root{
+    --color-dark: #333;
+    --color-grey: #D8D8D8;
+    --color-green: #00561b;
+}
+
 /* GENERAL */
 * {
     margin: 0;
@@ -14,19 +20,19 @@
 body{
     background-color: #F9F9F9;
     font-family: 'Poppins', sans-serif;
-    color: #333;
+    color: var(--color-dark);
 }
 h1, h2, h3, h4, h5, h6 {
     font-size: 4vw;
     text-transform: uppercase;
 }
 a, a:visited{
-    color: #333;
-    text-decoration-color: #333;
+    color: var(--color-dark);
+    text-decoration-color: var(--color-dark);
 }
 
 a:hover{
-    text-decoration-color: #00561b;
+    text-decoration-color: var(--color-green);
 }
 .text__head{
     text-underline-offset: .1vw;
@@ -47,12 +53,12 @@ a:hover{
     margin-bottom: 1%;
 }
 .button{
-    border: 1px solid #333;
+    border: 1px solid var(--color-dark);
     padding: .8vw 8vw;
     font-size: 1vw;
 }
 .button:hover{
-    background-color: #00561b;
+    background-color: var(--color-green);
     color: white;
     font-weight: 500;
 }
@@ -63,7 +69,7 @@ footer{
     display: flex;
     flex-direction: row;
     width: 100%;
-    background-color: #333;
+    background-color: var(--color-dark);
     padding: 0 10vw 0 10vw;
 }
 .text__footer{
@@ -73,7 +79,7 @@ footer{
     font-size: 1vw;
 }
 .text__footer > a:hover{
-    color: #D8D8D8;
+    color: var(--color-grey);
     text-decoration: none;
 }
 .text_footer2{
@@ -86,7 +92,7 @@ footer{
     color: white;
 }
 
-/* MAIN.EJS */
+/* TEMPLATE EJS */
 .head{
     display: flex;
     justify-content: center;
@@ -99,11 +105,11 @@ footer{
 }
 
 .watches__grid{
-    width: 100%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 4vw;
+    gap: 2vw;
 }
+
 .watches__list{
     background-color: white;
     display: flex;
@@ -113,9 +119,9 @@ footer{
 }
 
 .watches__border{
-    border: 1px solid #333;
+    border: 1px solid var(--color-dark);
     border-radius: 4px;
-    box-shadow: 0 0 10px #D8D8D8;
+    box-shadow: 0 0 10px var(--color-grey);
     padding: 2vw;
 }
 .watches__model{
@@ -126,14 +132,27 @@ footer{
 }
 
 .watches__price{
-    background-color: #333;
+    background-color: var(--color-dark);
     font-weight: 300;
     font-size: 1vw;
     border-radius: 1px;
     color: white;
     margin: 2vw 0 0 0;
     padding: .4vw 2vw;
-    border: 1px solid #333;
+    border: 1px solid var(--color-dark);
+}
+.watches__price:hover{
+    animation:radiusbtn .6s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+@keyframes radiusbtn {
+    0% {
+        background-color: var(--color-dark);
+    }
+    100% {
+        background-color: var(--color-green);
+    }
 }
 
 .watches__image{
